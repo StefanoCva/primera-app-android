@@ -115,8 +115,7 @@ name: Hola Mundo CI
 # Se ejecutará en cada push al repositorio
 on:
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
 
 jobs:
   hola:
