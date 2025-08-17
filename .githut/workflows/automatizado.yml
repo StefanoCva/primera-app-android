@@ -1,0 +1,131 @@
+# name: Android CI — Build, Test & Artifact (APK)
+
+# on:
+#   push:
+#     branches: [ ]  # GitFlow-friendly. Change to [main] if you only want main.
+#   # pull_request:
+#   #   branches: [ main, develop ]
+
+# permissions:
+#   contents: read
+
+# concurrency:
+#   group: android-ci-${{ github.ref }}
+#   cancel-in-progress: true
+
+# jobs:
+#   build-test-apk:
+#     runs-on: ubuntu-latest
+
+#     env:
+#       ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+#       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g" -Dorg.gradle.parallel=true -Dkotlin.compiler.execution.strategy=in-process
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: Validate Gradle Wrapper
+#         uses: gradle/actions/wrapper-validation@v3
+
+#       - name: Set up Java (Temurin)
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: 'temurin'
+#           java-version: '17'  # Use 11, 17, or 21 depending on your project
+#           cache: 'gradle'     # Enables Gradle dependency caching
+
+#       - name: Set up Android SDK
+#         uses: android-actions/setup-android@v3
+
+#       - name: Install Android SDK components
+#         run: |
+#           sdkmanager --install \
+#             "platform-tools" \
+#             "platforms;android-34" \
+#             "build-tools;34.0.0" \
+#             "cmdline-tools;latest"
+#           yes | sdkmanager --licenses
+
+#       - name: Show environment
+#         run: |
+#           java -version
+#           echo "JAVA_HOME=$JAVA_HOME"
+#           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+#           sdkmanager --list | head -n 50
+
+#       - name: Make Gradle wrapper executable (Linux)
+#         run: chmod +x ./gradlew
+
+#       # Optional: restore additional Gradle caches (setup-java already enables caching)
+#       - name: Cache Gradle modules (optional)
+#         uses: actions/cache@v4
+#         with:
+#           path: |
+#             ~/.gradle/caches
+#             ~/.gradle/wrapper
+#           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#           restore-keys: |
+#             ${{ runner.os }}-gradle-
+
+#       - name: Download dependencies
+#         run: ./gradlew --no-daemon dependencies
+
+#       - name: Run unit tests
+#         run: ./gradlew --no-daemon test
+
+#       - name: Assemble Debug APK
+#         run: ./gradlew --no-daemon assembleDebug
+
+#       - name: Locate APKs
+#         run: |
+#           echo "Listing APKs:"
+#           find $GITHUB_WORKSPACE -type f -name "*.apk" -print
+
+#       - name: Upload APK artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: app-debug-apk
+#           path: |
+#             **/build/outputs/apk/debug/*.apk
+#           if-no-files-found: error
+
+#       # Optional: publish unit test reports as artifacts
+#       - name: Upload test reports (optional)
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: unit-test-reports
+#           path: |
+#             **/build/test-results/test/**
+#             **/build/reports/tests/test/**
+#           if-no-files-found: ignore
+
+#       # Optional: capture Gradle build scans or diagnostics on failure
+#       - name: Post-failure diagnostics
+#         if: failure()
+#         run: |
+#           echo "Gradle cache directory sizes:" || true
+#           du -sh ~/.gradle/* || true
+#           echo "Recent Gradle logs:" || true
+#           find . -type f -path "**/build/*.log" -maxdepth 5 -print || true
+
+name: Hola Mundo CI
+
+# Se ejecutará en cada push al repositorio
+on:
+  push:
+    branches: [ main, developer ]
+
+jobs:
+  hola:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Clonar el repositorio
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      # Paso 2: Ejecutar un comando
+      - name: Imprimir Hola Mundo
+        run: echo "¡Hola Mundo desde GitHub Actions!"
